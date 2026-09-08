@@ -24,7 +24,9 @@ export default async function DashboardPage() {
           <div>
             <h2 className="text-2xl font-bold">Dashboard</h2>
             <p className="text-muted-foreground">
-              Selamat datang, {user?.user_metadata?.full_name || user?.email}
+              {user
+                ? `Selamat datang, ${user?.user_metadata?.full_name || user?.email}`
+                : "Selamat datang di Kanban Board"}
             </p>
           </div>
         </div>

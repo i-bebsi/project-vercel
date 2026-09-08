@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 
+const ANONYMOUS_USER_ID = "00000000-0000-0000-0000-000000000000"
+
 export default function CreateBoardDialog() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
@@ -34,12 +36,19 @@ export default function CreateBoardDialog() {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) return
+    const ownerId = user?.id || ANONYMOUS_USER_ID
+
+    if (!user) {
+      await supabase.from("profiles").upsert({
+        id: ANONYMOUS_USER_ID,
+        full_name: "Anonymous User",
+      })
+    }
 
     const { error } = await supabase.from("boards").insert({
       name,
       description: description || null,
-      owner_id: user.id,
+      owner_id: ownerId,
     })
 
     if (!error) {
