@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe()
   }, [supabase])
 
-  const isAnonymous = user?.is_anonymous === true
+  const isAnonymous = !user || user.is_anonymous === true
 
   console.log("[AuthContext] render - user:", user?.id, "isAnonymous:", isAnonymous, "loading:", loading)
 
