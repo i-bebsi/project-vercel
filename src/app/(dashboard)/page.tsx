@@ -16,6 +16,36 @@ export default async function DashboardPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
+  const boardIds = (boards || []).map((b) => b.id)
+
+  const { data: allColumns } = boardIds.length
+    ? await supabase.from("columns").select("*").in("board_id", boardIds)
+    : { data: [] }
+
+  const { data: allCards } = boardIds.length
+    ? await supabase.from("cards").select("id, board_id, column_id").in("board_id", boardIds)
+    : { data: [] }
+
+  const boardsWithStats = (boards || []).map((board) => {
+    const boardColumns = (allColumns || [])
+      .filter((c) => c.board_id === board.id)
+      .sort((a, b) => a.position - b.position)
+    const boardCards = (allCards || []).filter((c) => c.board_id === board.id)
+
+    const columnCardCounts = boardColumns.map((col) => ({
+      columnId: col.id,
+      name: col.name,
+      count: boardCards.filter((card) => card.column_id === col.id).length,
+    }))
+
+    return {
+      ...board,
+      column_count: boardColumns.length,
+      total_cards: boardCards.length,
+      column_card_counts: columnCardCounts,
+    }
+  })
+
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />
@@ -30,7 +60,7 @@ export default async function DashboardPage() {
             </p>
           </div>
         </div>
-        <BoardList boards={boards || []} />
+        <BoardList boards={boardsWithStats} />
       </main>
     </div>
   )

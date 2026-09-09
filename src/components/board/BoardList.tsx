@@ -5,8 +5,20 @@ import CreateBoardDialog from "./CreateBoardDialog"
 import { LayoutGrid } from "lucide-react"
 import type { Board } from "@/types/database"
 
+interface ColumnCount {
+  columnId: string
+  name: string
+  count: number
+}
+
+interface BoardWithStats extends Board {
+  column_count?: number
+  total_cards?: number
+  column_card_counts?: ColumnCount[]
+}
+
 interface BoardListProps {
-  boards: Board[]
+  boards: BoardWithStats[]
 }
 
 export default function BoardList({ boards }: BoardListProps) {
