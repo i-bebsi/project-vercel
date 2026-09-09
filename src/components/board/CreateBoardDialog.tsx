@@ -18,40 +18,39 @@ import {
 } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 
-const ANONYMOUS_USER_ID = "00000000-0000-0000-0000-000000000000"
-
 export default function CreateBoardDialog() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
   const router = useRouter()
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+    setError(null)
 
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    const ownerId = user?.id || ANONYMOUS_USER_ID
-
     if (!user) {
-      await supabase.from("profiles").upsert({
-        id: ANONYMOUS_USER_ID,
-        full_name: "Anonymous User",
-      })
+      setError("Silakan login terlebih dahulu")
+      setLoading(false)
+      return
     }
 
     const { error } = await supabase.from("boards").insert({
       name,
       description: description || null,
-      owner_id: ownerId,
+      owner_id: user.id,
     })
 
-    if (!error) {
+    if (error) {
+      setError(error.message)
+    } else {
       setOpen(false)
       setName("")
       setDescription("")
@@ -95,6 +94,9 @@ export default function CreateBoardDialog() {
               rows={3}
             />
           </div>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Batal
