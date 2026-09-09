@@ -14,13 +14,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
+import { User } from "lucide-react"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [guestLoading, setGuestLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -37,6 +40,22 @@ export default function LoginForm() {
     if (error) {
       setError(error.message)
       setLoading(false)
+      return
+    }
+
+    router.push("/")
+    router.refresh()
+  }
+
+  async function handleGuestLogin() {
+    setGuestLoading(true)
+    setError(null)
+
+    const { error } = await supabase.auth.signInAnonymously()
+
+    if (error) {
+      setError(error.message)
+      setGuestLoading(false)
       return
     }
 
@@ -83,6 +102,21 @@ export default function LoginForm() {
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Memproses..." : "Masuk"}
+          </Button>
+          <div className="flex w-full items-center gap-2">
+            <Separator className="flex-1" />
+            <span className="text-xs text-muted-foreground">ATAU</span>
+            <Separator className="flex-1" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleGuestLogin}
+            disabled={guestLoading}
+          >
+            <User className="mr-2 h-4 w-4" />
+            {guestLoading ? "Memproses..." : "Masuk sebagai Tamu"}
           </Button>
           <p className="text-sm text-muted-foreground">
             Belum punya akun?{" "}
