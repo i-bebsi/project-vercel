@@ -7,13 +7,22 @@ import KanbanColumn from "./KanbanColumn"
 import CardDetailDialog from "./CardDetailDialog"
 import SearchFilter from "./SearchFilter"
 import BoardHeader from "./BoardHeader"
+import BoardStats from "./BoardStats"
 import type { BoardColumn, Card, Label, Board } from "@/types/database"
+
+interface ColumnCount {
+  columnId: string
+  name: string
+  count: number
+}
 
 interface KanbanBoardProps {
   board: Board
   initialColumns: BoardColumn[]
   initialCards: (Card & { labels?: Label[] })[]
   initialLabels: Label[]
+  totalCards: number
+  columnCardCounts: ColumnCount[]
 }
 
 export default function KanbanBoard({
@@ -21,10 +30,14 @@ export default function KanbanBoard({
   initialColumns,
   initialCards,
   initialLabels,
+  totalCards: initialTotalCards,
+  columnCardCounts: initialColumnCardCounts,
 }: KanbanBoardProps) {
   const [columns] = useState(initialColumns)
   const [cards, setCards] = useState(initialCards)
   const [labels] = useState(initialLabels)
+  const [totalCards, setTotalCards] = useState(initialTotalCards)
+  const [columnCardCounts, setColumnCardCounts] = useState(initialColumnCardCounts)
   const [selectedCard, setSelectedCard] = useState<(Card & { labels?: Label[] }) | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterLabel, setFilterLabel] = useState<string>("all")
@@ -43,8 +56,16 @@ export default function KanbanBoard({
         labels: card.labels?.map((cl: { label: Label }) => cl.label) || [],
       }))
       setCards(formatted)
+      setTotalCards(formatted.length)
+      setColumnCardCounts(
+        columns.map((col) => ({
+          columnId: col.id,
+          name: col.name,
+          count: formatted.filter((c) => c.column_id === col.id).length,
+        }))
+      )
     }
-  }, [board.id, supabase])
+  }, [board.id, supabase, columns])
 
   useEffect(() => {
     const channel = supabase
@@ -174,6 +195,9 @@ export default function KanbanBoard({
             onFilterChange={setFilterLabel}
             labels={labels}
           />
+        </div>
+        <div className="mb-6">
+          <BoardStats totalCards={totalCards} columnCardCounts={columnCardCounts} />
         </div>
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="flex gap-4">

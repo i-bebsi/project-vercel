@@ -44,12 +44,21 @@ export default async function BoardPage({ params }: BoardPageProps) {
     .select("*")
     .eq("board_id", id)
 
+  const totalCards = cards.length
+  const columnCardCounts = (columns || []).map(col => ({
+    columnId: col.id,
+    name: col.name,
+    count: cards.filter(c => c.column_id === col.id).length,
+  }))
+
   return (
     <KanbanBoard
       board={board}
       initialColumns={columns || []}
       initialCards={cards}
       initialLabels={labels || []}
+      totalCards={totalCards}
+      columnCardCounts={columnCardCounts}
     />
   )
 }

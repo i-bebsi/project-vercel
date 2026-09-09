@@ -13,6 +13,18 @@ interface KanbanColumnProps {
   onCardRefresh: () => void
 }
 
+const STATUS_COLORS: Record<string, string> = {
+  "to do": "border-t-gray-400",
+  "in progress": "border-t-blue-500",
+  "done": "border-t-green-500",
+}
+
+const STATUS_BADGE_COLORS: Record<string, string> = {
+  "to do": "bg-gray-400",
+  "in progress": "bg-blue-500",
+  "done": "bg-green-500",
+}
+
 export default function KanbanColumn({
   column,
   cards,
@@ -20,11 +32,14 @@ export default function KanbanColumn({
   onCardClick,
   onCardRefresh,
 }: KanbanColumnProps) {
+  const borderTopColor = STATUS_COLORS[column.name.toLowerCase()] || "border-t-gray-400"
+  const badgeColor = STATUS_BADGE_COLORS[column.name.toLowerCase()] || "bg-gray-400"
+
   return (
-    <div className="flex w-72 shrink-0 flex-col rounded-lg bg-muted/50 p-3">
+    <div className={`flex w-72 shrink-0 flex-col rounded-lg bg-muted/50 p-3 border-t-2 ${borderTopColor}`}>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold">{column.name}</h3>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+        <span className={`rounded-full px-2 py-0.5 text-xs text-white ${badgeColor}`}>
           {cards.length}
         </span>
       </div>
