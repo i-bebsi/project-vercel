@@ -11,15 +11,16 @@ interface KanbanCardProps {
   card: CardType & { labels?: Label[] }
   onClick?: () => void
   isDragging?: boolean
+  isAnonymous?: boolean
 }
 
-export default function KanbanCard({ card, onClick, isDragging }: KanbanCardProps) {
+export default function KanbanCard({ card, onClick, isDragging, isAnonymous = false }: KanbanCardProps) {
   return (
     <Card
-      className={`cursor-pointer transition-shadow hover:shadow-md ${
-        isDragging ? "shadow-lg ring-2 ring-primary" : ""
-      }`}
-      onClick={onClick}
+      className={`transition-shadow ${
+        isAnonymous ? "cursor-default" : "cursor-pointer hover:shadow-md"
+      } ${isDragging ? "shadow-lg ring-2 ring-primary" : ""}`}
+      onClick={isAnonymous ? undefined : onClick}
     >
       <CardContent className="p-3">
         <div className="flex items-start justify-between gap-2">

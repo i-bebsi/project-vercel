@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd"
 import { createClient } from "@/lib/supabase/client"
+import { useAuth } from "@/contexts/AuthContext"
 import KanbanColumn from "./KanbanColumn"
 import CardDetailDialog from "./CardDetailDialog"
 import SearchFilter from "./SearchFilter"
@@ -33,6 +34,7 @@ export default function KanbanBoard({
   totalCards: initialTotalCards,
   columnCardCounts: initialColumnCardCounts,
 }: KanbanBoardProps) {
+  const { isAnonymous } = useAuth()
   const [columns] = useState(initialColumns)
   const [cards, setCards] = useState(initialCards)
   const [labels] = useState(initialLabels)
@@ -85,6 +87,8 @@ export default function KanbanBoard({
   }, [board.id, supabase, fetchCards])
 
   async function handleDragEnd(result: DropResult) {
+    if (isAnonymous) return
+
     const { destination, source, draggableId } = result
 
     if (!destination) return
@@ -213,6 +217,7 @@ export default function KanbanBoard({
                   boardId={board.id}
                   onCardClick={setSelectedCard}
                   onCardRefresh={fetchCards}
+                  isAnonymous={isAnonymous}
                 />
               ))}
           </div>
@@ -226,6 +231,7 @@ export default function KanbanBoard({
           open={!!selectedCard}
           onOpenChange={(open) => !open && setSelectedCard(null)}
           onCardUpdated={fetchCards}
+          isAnonymous={isAnonymous}
         />
       )}
     </div>

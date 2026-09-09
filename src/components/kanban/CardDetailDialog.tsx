@@ -26,6 +26,7 @@ interface CardDetailDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onCardUpdated: () => void
+  isAnonymous?: boolean
 }
 
 export default function CardDetailDialog({
@@ -34,6 +35,7 @@ export default function CardDetailDialog({
   open,
   onOpenChange,
   onCardUpdated,
+  isAnonymous = false,
 }: CardDetailDialogProps) {
   const [title, setTitle] = useState(card.title)
   const [description, setDescription] = useState(card.description || "")
@@ -109,6 +111,7 @@ export default function CardDetailDialog({
               id="detailTitle"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={isAnonymous}
             />
           </div>
 
@@ -120,6 +123,7 @@ export default function CardDetailDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
+              disabled={isAnonymous}
             />
           </div>
 
@@ -130,52 +134,63 @@ export default function CardDetailDialog({
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+              disabled={isAnonymous}
             />
           </div>
 
           <Separator />
 
-          <div className="space-y-2">
-            <Label>Label</Label>
-            <div className="flex flex-wrap gap-2">
-              {labels.map((label) => (
-                <Badge
-                  key={label.id}
-                  variant={selectedLabels.includes(label.id) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  style={
-                    selectedLabels.includes(label.id)
-                      ? { backgroundColor: label.color, color: "white" }
-                      : { borderColor: label.color, color: label.color }
-                  }
-                  onClick={() => toggleLabel(label.id)}
-                >
-                  {label.name}
-                </Badge>
-              ))}
-              {labels.length === 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Belum ada label. Buat label di SQL editor Supabase.
-                </p>
-              )}
+          {!isAnonymous && (
+            <div className="space-y-2">
+              <Label>Label</Label>
+              <div className="flex flex-wrap gap-2">
+                {labels.map((label) => (
+                  <Badge
+                    key={label.id}
+                    variant={selectedLabels.includes(label.id) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    style={
+                      selectedLabels.includes(label.id)
+                        ? { backgroundColor: label.color, color: "white" }
+                        : { borderColor: label.color, color: label.color }
+                    }
+                    onClick={() => toggleLabel(label.id)}
+                  >
+                    {label.name}
+                  </Badge>
+                ))}
+                {labels.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Belum ada label. Buat label di SQL editor Supabase.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        <DialogFooter className="flex flex-row items-center justify-between sm:justify-between">
-          <Button variant="destructive" size="sm" onClick={handleDelete}>
-            <Trash2 className="mr-1 h-4 w-4" />
-            Hapus
-          </Button>
-          <div className="flex gap-2">
+        {!isAnonymous ? (
+          <DialogFooter className="flex flex-row items-center justify-between sm:justify-between">
+            <Button variant="destructive" size="sm" onClick={handleDelete}>
+              <Trash2 className="mr-1 h-4 w-4" />
+              Hapus
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Batal
+              </Button>
+              <Button onClick={handleSave} disabled={loading}>
+                {loading ? "Menyimpan..." : "Simpan"}
+              </Button>
+            </div>
+          </DialogFooter>
+        ) : (
+          <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Batal
+              Tutup
             </Button>
-            <Button onClick={handleSave} disabled={loading}>
-              {loading ? "Menyimpan..." : "Simpan"}
-            </Button>
-          </div>
-        </DialogFooter>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   )

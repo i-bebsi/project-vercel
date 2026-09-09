@@ -11,6 +11,7 @@ interface KanbanColumnProps {
   boardId: string
   onCardClick: (card: Card & { labels?: Label[] }) => void
   onCardRefresh: () => void
+  isAnonymous?: boolean
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -31,6 +32,7 @@ export default function KanbanColumn({
   boardId,
   onCardClick,
   onCardRefresh,
+  isAnonymous = false,
 }: KanbanColumnProps) {
   const borderTopColor = STATUS_COLORS[column.name.toLowerCase()] || "border-t-gray-400"
   const badgeColor = STATUS_BADGE_COLORS[column.name.toLowerCase()] || "bg-gray-400"
@@ -66,6 +68,7 @@ export default function KanbanColumn({
                       card={card}
                       onClick={() => onCardClick(card)}
                       isDragging={snapshot.isDragging}
+                      isAnonymous={isAnonymous}
                     />
                   </div>
                 )}
@@ -76,13 +79,15 @@ export default function KanbanColumn({
         )}
       </Droppable>
 
-      <div className="mt-2">
-        <CreateCardDialog
-          columnId={column.id}
-          boardId={boardId}
-          onCardCreated={onCardRefresh}
-        />
-      </div>
+      {!isAnonymous && (
+        <div className="mt-2">
+          <CreateCardDialog
+            columnId={column.id}
+            boardId={boardId}
+            onCardCreated={onCardRefresh}
+          />
+        </div>
+      )}
     </div>
   )
 }
