@@ -51,7 +51,7 @@ export default function KanbanCard({ card, onClick, isDragging, isAnonymous = fa
               </p>
             )}
           </div>
-          <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+          {!isAnonymous && <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground/50" />}
         </div>
       </CardContent>
     </Card>

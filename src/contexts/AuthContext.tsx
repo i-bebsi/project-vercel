@@ -33,13 +33,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      setLoading(false)
     })
 
     return () => subscription.unsubscribe()
   }, [supabase])
 
+  const isAnonymous = user?.is_anonymous === true
+
   return (
-    <AuthContext.Provider value={{ user, isAnonymous: user?.is_anonymous ?? false, loading }}>
+    <AuthContext.Provider value={{ user, isAnonymous, loading }}>
       {children}
     </AuthContext.Provider>
   )

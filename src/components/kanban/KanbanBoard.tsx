@@ -34,7 +34,7 @@ export default function KanbanBoard({
   totalCards: initialTotalCards,
   columnCardCounts: initialColumnCardCounts,
 }: KanbanBoardProps) {
-  const { isAnonymous } = useAuth()
+  const { isAnonymous, loading: authLoading } = useAuth()
   const [columns] = useState(initialColumns)
   const [cards, setCards] = useState(initialCards)
   const [labels] = useState(initialLabels)
@@ -186,6 +186,24 @@ export default function KanbanBoard({
 
     return matchesSearch && matchesLabel
   })
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <BoardHeader board={board} />
+        <div className="flex-1 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 w-48 rounded bg-muted" />
+            <div className="flex gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-64 w-72 rounded-lg bg-muted/50" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

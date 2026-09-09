@@ -46,38 +46,49 @@ export default function KanbanColumn({
         </span>
       </div>
 
-      <Droppable droppableId={column.id}>
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className={`flex flex-1 flex-col gap-2 overflow-y-auto rounded-md p-1 transition-colors ${
-              snapshot.isDraggingOver ? "bg-accent" : ""
-            }`}
-            style={{ minHeight: 100 }}
-          >
-            {cards.map((card, index) => (
-              <Draggable key={card.id} draggableId={card.id} index={index}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    <KanbanCard
-                      card={card}
-                      onClick={() => onCardClick(card)}
-                      isDragging={snapshot.isDragging}
-                      isAnonymous={isAnonymous}
-                    />
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+      {isAnonymous ? (
+        <div className="flex flex-1 flex-col gap-2 overflow-y-auto rounded-md p-1" style={{ minHeight: 100 }}>
+          {cards.map((card) => (
+            <KanbanCard
+              key={card.id}
+              card={card}
+              isAnonymous={true}
+            />
+          ))}
+        </div>
+      ) : (
+        <Droppable droppableId={column.id}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`flex flex-1 flex-col gap-2 overflow-y-auto rounded-md p-1 transition-colors ${
+                snapshot.isDraggingOver ? "bg-accent" : ""
+              }`}
+              style={{ minHeight: 100 }}
+            >
+              {cards.map((card, index) => (
+                <Draggable key={card.id} draggableId={card.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <KanbanCard
+                        card={card}
+                        onClick={() => onCardClick(card)}
+                        isDragging={snapshot.isDragging}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      )}
 
       {!isAnonymous && (
         <div className="mt-2">
