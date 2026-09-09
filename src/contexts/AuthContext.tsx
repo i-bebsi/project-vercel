@@ -27,11 +27,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log("[AuthContext] getUser result:", user)
+      console.log("[AuthContext] is_anonymous:", user?.is_anonymous)
       setUser(user)
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[AuthContext] onAuthStateChange:", event, session?.user?.is_anonymous)
       setUser(session?.user ?? null)
       setLoading(false)
     })
@@ -40,6 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase])
 
   const isAnonymous = user?.is_anonymous === true
+
+  console.log("[AuthContext] render - user:", user?.id, "isAnonymous:", isAnonymous, "loading:", loading)
 
   return (
     <AuthContext.Provider value={{ user, isAnonymous, loading }}>
